@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mayssa Ben Fredj — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080c10;
+      --surface: #0d1117;
+      --border: #1e2a38;
+      --accent: #00e5a0;
+      --accent2: #00aaff;
+      --text: #c9d1d9;
+      --text-dim: #586069;
+      --text-bright: #f0f6fc;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--mono); overflow-x: hidden; cursor: none; }
+
+    .cursor { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: screen; }
+    .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 9998; transition: width 0.2s, height 0.2s, opacity 0.2s; opacity: 0.5; }
+
+    #canvas-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.25; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 4rem; background: rgba(8,12,16,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: var(--sans); font-weight: 800; font-size: 1.1rem; color: var(--accent); letter-spacing: 0.05em; }
+    .nav-logo span { color: var(--text-dim); font-weight: 400; }
+    nav ul { list-style: none; display: flex; gap: 2.5rem; }
+    nav ul a { color: var(--text-dim); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    nav ul a:hover, nav ul a.active { color: var(--accent); }
+
+    section { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; padding: 7rem 4rem 4rem; max-width: 1200px; margin: 0 auto; }
+
+    /* HERO */
+    #hero { flex-direction: column; justify-content: center; gap: 1.5rem; padding-top: 10rem; }
+    .hero-tag { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); display: inline-block; padding: 0.3rem 0.8rem; border-radius: 2px; animation: fadeIn 0.5s ease both; }
+    .hero-name { font-family: var(--sans); font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 800; color: var(--text-bright); line-height: 0.95; letter-spacing: -0.02em; animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    .hero-name .accent { color: var(--accent); }
+    .hero-subtitle { font-size: 0.9rem; color: var(--text-dim); max-width: 520px; line-height: 1.8; animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both; }
+    .type-line { font-size: 1.1rem; color: var(--accent2); display: flex; align-items: center; gap: 0.5rem; animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
+    .type-line::before { content: '>_'; color: var(--accent); }
+    .typed-text::after { content: '|'; animation: blink 0.8s step-end infinite; }
+    .hero-cta { display: flex; gap: 1rem; margin-top: 0.5rem; animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s both; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; border: none; transition: all 0.25s ease; }
+    .btn-primary { background: var(--accent); color: var(--bg); clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); }
+    .btn-primary:hover { background: #00ffb3; transform: translateY(-2px); }
+    .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-secondary:hover { background: rgba(0,229,160,0.08); transform: translateY(-2px); }
+    .scroll-hint { position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--text-dim); animation: fadeIn 1s ease 1s both; }
+    .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollPulse 2s ease infinite; }
+
+    /* SECTION HEADER */
+    .section-header { margin-bottom: 4rem; }
+    .section-num { font-size: 0.65rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; }
+    .section-title { font-family: var(--sans); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; color: var(--text-bright); line-height: 1; margin-top: 0.5rem; }
+
+    /* ABOUT */
+    #about { flex-direction: column; min-height: auto; padding-bottom: 6rem; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; width: 100%; }
+    .about-text p { font-size: 0.85rem; line-height: 2; color: var(--text); margin-bottom: 1.2rem; }
+    .about-text p strong { color: var(--accent); }
+    .lang-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.5rem; }
+    .lang-item { display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; }
+    .lang-label { color: var(--text-dim); min-width: 80px; }
+    .lang-bar { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .lang-fill { height: 100%; background: linear-gradient(to right, var(--accent), var(--accent2)); border-radius: 2px; transform: scaleX(0); transform-origin: left; transition: transform 1s cubic-bezier(0.16,1,0.3,1); }
+    .lang-level { color: var(--text-bright); min-width: 70px; text-align: right; font-size: 0.7rem; }
+    .info-card { background: var(--surface); border: 1px solid var(--border); padding: 2rem; position: relative; overflow: hidden; }
+    .info-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+    .info-card h3 { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+    .edu-item { display: flex; justify-content: space-between; align-items: baseline; padding: 0.7rem 0; border-bottom: 1px solid var(--border); font-size: 0.78rem; }
+    .edu-item:last-child { border-bottom: none; }
+    .edu-item .school { color: var(--text-bright); }
+    .edu-item .year { color: var(--text-dim); font-size: 0.7rem; }
+    .interests { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .tag { padding: 0.3rem 0.8rem; background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); color: var(--accent); font-size: 0.68rem; letter-spacing: 0.08em; }
+    .tag.blue { background: rgba(0,170,255,0.06); border-color: rgba(0,170,255,0.2); color: var(--accent2); }
+
+    /* SKILLS */
+    #skills { flex-direction: column; min-height: auto; padding-bottom: 6rem; }
+    .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; width: 100%; }
+    .skill-card { background: var(--surface); border: 1px solid var(--border); padding: 1.8rem; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
+    .skill-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .skill-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+    .skill-card h3 { font-family: var(--sans); font-size: 0.85rem; font-weight: 700; color: var(--text-bright); margin-bottom: 1rem; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .skill-tag { font-size: 0.65rem; padding: 0.2rem 0.6rem; background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); letter-spacing: 0.05em; transition: all 0.2s; }
+    .skill-card:hover .skill-tag { border-color: rgba(0,229,160,0.3); color: var(--text); }
+
+    /* PROJECTS */
+    #projects { flex-direction: column; min-height: auto; padding-bottom: 6rem; }
+    .projects-list { display: flex; flex-direction: column; gap: 1.5rem; width: 100%; }
+    .project-card { background: var(--surface); border: 1px solid var(--border); padding: 2rem 2.5rem; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; cursor: pointer; }
+    .project-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, var(--accent), var(--accent2)); transform: scaleX(0); transition: transform 0.4s ease; }
+    .project-card:hover::before { transform: scaleX(1); }
+    .project-card:hover { border-color: rgba(0,229,160,0.3); transform: translateX(6px); }
+    .project-num { font-size: 0.65rem; color: var(--accent); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+    .project-card h3 { font-family: var(--sans); font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.7rem; }
+    .project-card p { font-size: 0.78rem; line-height: 1.9; color: var(--text); max-width: 680px; }
+    .project-stack { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+    .project-right { display: flex; flex-direction: column; align-items: flex-end; gap: 1rem; }
+    .repo-link { font-size: 0.68rem; color: var(--accent); text-decoration: none; border: 1px solid rgba(0,229,160,0.3); padding: 0.3rem 0.7rem; letter-spacing: 0.08em; transition: all 0.2s; white-space: nowrap; }
+    .repo-link:hover { background: rgba(0,229,160,0.1); border-color: var(--accent); }
+    .project-arrow { font-size: 1.5rem; color: var(--accent); opacity: 0; transform: translateX(-10px); transition: all 0.3s; }
+    .project-card:hover .project-arrow { opacity: 1; transform: translateX(0); }
+
+    /* EXPERIENCE */
+    #experience { flex-direction: column; min-height: auto; padding-bottom: 6rem; }
+    .exp-item { display: grid; grid-template-columns: 180px 1fr; gap: 3rem; width: 100%; padding: 2.5rem 0; border-bottom: 1px solid var(--border); position: relative; }
+    .exp-item::before { content: ''; position: absolute; left: 178px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+    .exp-date { font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.1em; }
+    .exp-company { font-family: var(--sans); font-weight: 700; font-size: 0.85rem; color: var(--accent); margin-top: 0.4rem; }
+    .exp-right h3 { font-family: var(--sans); font-size: 1.1rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.8rem; }
+    .exp-right p { font-size: 0.8rem; line-height: 1.9; color: var(--text); }
+    .cert-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 3rem; width: 100%; }
+    .cert-card { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; display: flex; gap: 1rem; align-items: flex-start; transition: border-color 0.3s; }
+    .cert-card:hover { border-color: var(--accent); }
+    .cert-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .cert-body h4 { font-family: var(--sans); font-size: 0.8rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.3rem; }
+    .cert-body p { font-size: 0.7rem; color: var(--text-dim); line-height: 1.6; }
+
+    /* CONTACT */
+    #contact { flex-direction: column; align-items: center; text-align: center; justify-content: center; padding-bottom: 6rem; }
+    .contact-inner { max-width: 640px; }
+    .contact-tagline { font-size: 0.85rem; color: var(--text); line-height: 1.9; margin: 1.5rem 0 3rem; }
+    .contact-links { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
+    .contact-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); text-decoration: none; font-size: 0.78rem; transition: color 0.2s; padding: 0.8rem 1.2rem; border: 1px solid var(--border); }
+    .contact-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    footer { position: relative; z-index: 1; text-align: center; padding: 2rem; border-top: 1px solid var(--border); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; }
+
+    .grid-overlay { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(rgba(0,229,160,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,160,0.015) 1px, transparent 1px); background-size: 80px 80px; pointer-events: none; }
+
+    @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+    @keyframes slideUp { from { opacity:0; transform: translateY(30px) } to { opacity:1; transform: translateY(0) } }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    @keyframes scrollPulse { 0%,100%{ opacity:1; transform: scaleY(1) } 50%{ opacity:0.3; transform: scaleY(0.5) } }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      nav ul { display: none; }
+      section { padding: 5rem 1.5rem 3rem; }
+      .about-grid, .skills-grid, .cert-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .project-card { grid-template-columns: 1fr; }
+      .exp-item { grid-template-columns: 1fr; gap: 1rem; }
+      .exp-item::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="grid-overlay"></div>
+  <canvas id="canvas-bg"></canvas>
+
+  <nav>
+    <div class="nav-logo">MBF<span>.dev</span></div>
+    <ul>
+      <li><a href="#about">À propos</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projets</a></li>
+      <li><a href="#experience">Expérience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-tag">À la recherche d'un Master · Nantes</div>
+    <h1 class="hero-name">Mayssa<br><span class="accent">Ben Fredj</span></h1>
+    <div class="type-line"><span class="typed-text" id="typedText"></span></div>
+    <p class="hero-subtitle">Étudiante en L3 Informatique passionnée par la cybersécurité et l'ingénierie logicielle. Je code, je sécurise, je construis.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">Voir mes projets</a>
+      <a href="#contact" class="btn btn-secondary">Me contacter</a>
+    </div>
+    <div class="scroll-hint">
+      <span>scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <div class="section-num">// 01</div>
+      <h2 class="section-title">À propos</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>Je suis <strong>Mayssa Ben Fredj</strong>, étudiante en L3 Informatique à <strong>Nantes Université</strong>, actuellement à la recherche d'un <strong>Master</strong> pour approfondir mes compétences.</p>
+        <p>Ma double passion pour la <strong>cybersécurité</strong> et l'<strong>ingénierie logicielle</strong> me pousse à explorer chaque couche du système — du réseau jusqu'à l'interface utilisateur.</p>
+        <p>J'ai travaillé en équipe sur de nombreux projets universitaires ambitieux, de 3 à 16 personnes, en appliquant des méthodes de développement collaboratif et des concepts avancés de POO.</p>
+        <div class="lang-list">
+          <div class="lang-item"><span class="lang-label">Français</span><div class="lang-bar"><div class="lang-fill" data-width="100"></div></div><span class="lang-level">C2 · Bilingue</span></div>
+          <div class="lang-item"><span class="lang-label">Anglais</span><div class="lang-bar"><div class="lang-fill" data-width="88"></div></div><span class="lang-level">C1 · Certifié</span></div>
+          <div class="lang-item"><span class="lang-label">Arabe</span><div class="lang-bar"><div class="lang-fill" data-width="100"></div></div><span class="lang-level">Maternelle</span></div>
+          <div class="lang-item"><span class="lang-label">Allemand</span><div class="lang-bar"><div class="lang-fill" data-width="15"></div></div><span class="lang-level">A1</span></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="info-card" style="margin-bottom:1.5rem">
+          <h3>Formation</h3>
+          <div class="edu-item"><span class="school">L3 Informatique · Nantes Université</span><span class="year">en cours</span></div>
+          <div class="edu-item"><span class="school">L2 Informatique · Nantes Université</span><span class="year">2024–25</span></div>
+          <div class="edu-item"><span class="school">L1 Informatique · Nantes Université</span><span class="year">2023–24</span></div>
+          <div class="edu-item"><span class="school">Baccalauréat général</span><span class="year">2022–23</span></div>
+        </div>
+        <div class="info-card">
+          <h3>Centres d'intérêt</h3>
+          <div class="interests">
+            <span class="tag">&#9822; Échecs (Ex-Championne)</span>
+            <span class="tag blue">Natation</span>
+            <span class="tag">Tennis</span>
+            <span class="tag blue">Volley</span>
+            <span class="tag">Badminton</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <div class="section-num">// 02</div>
+      <h2 class="section-title">Compétences</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <div class="skill-icon">&#128187;</div>
+        <h3>Langages</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">C++</span><span class="skill-tag">Python</span><span class="skill-tag">Java</span><span class="skill-tag">JavaScript</span><span class="skill-tag">TypeScript</span><span class="skill-tag">HTML/CSS</span><span class="skill-tag">Julia</span><span class="skill-tag">OCaml</span>
+        </div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">&#128274;</div>
+        <h3>Cybersécurité &amp; Réseaux</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Linux</span><span class="skill-tag">Wireshark</span><span class="skill-tag">Packet Tracer</span><span class="skill-tag">ANSSI SecNumacadémie</span><span class="skill-tag">Protocoles réseau</span>
+        </div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">&#128451;</div>
+        <h3>Bases de données</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">SQL</span><span class="skill-tag">Création &amp; requêtes</span><span class="skill-tag">Gestion utilisateurs</span><span class="skill-tag">Privilèges</span>
+        </div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">&#9881;</div>
+        <h3>Concepts &amp; Ingénierie</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Algorithmique</span><span class="skill-tag">POO</span><span class="skill-tag">Traitement de données</span><span class="skill-tag">Fichiers Python</span>
+        </div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">&#127760;</div>
+        <h3>Web &amp; Marketing</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">HTML/CSS/JS</span><span class="skill-tag">WordPress</span><span class="skill-tag">SEO</span><span class="skill-tag">Full-Stack</span>
+        </div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="skill-icon">&#129309;</div>
+        <h3>Soft Skills</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Travail d'équipe</span><span class="skill-tag">Rigueur</span><span class="skill-tag">Adaptabilité</span><span class="skill-tag">Curiosité technique</span><span class="skill-tag">Leadership</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <div class="section-num">// 03</div>
+      <h2 class="section-title">Projets académiques</h2>
+    </div>
+    <div class="projects-list">
+
+      <div class="project-card reveal" onclick="window.open('https://github.com/mayssabf98/TinyFarm','_blank')">
+        <div>
+          <div class="project-num">Projet 01</div>
+          <h3>Application Web "Tiny Farm"</h3>
+          <p>Développement collaboratif d'une application web complète (backend + frontend) au sein d'une équipe de 16 personnes. Coordination en grande équipe et livraison d'une application fonctionnelle.</p>
+          <div class="project-stack"><span class="tag">Java</span><span class="tag blue">Backend</span><span class="tag blue">Frontend</span><span class="tag">16 personnes</span></div>
+        </div>
+        <div class="project-right">
+          <a href="https://github.com/mayssabf98/TinyFarm" target="_blank" class="repo-link" onclick="event.stopPropagation()">GitHub &#8599;</a>
+          <span class="project-arrow">&#8594;</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="window.open('https://gitlab.univ-nantes.fr/E230889R/projet-quoridor-mayssa','_blank')">
+        <div>
+          <div class="project-num">Projet 02</div>
+          <h3>Jeu Quoridor</h3>
+          <p>Modélisation et développement complet du jeu de plateau Quoridor en équipe de 3 personnes. Implémentation des règles, gestion des tours et interface de jeu.</p>
+          <div class="project-stack"><span class="tag">TypeScript</span><span class="tag blue">Jeu de plateau</span><span class="tag">3 personnes</span></div>
+        </div>
+        <div class="project-right">
+          <a href="https://gitlab.univ-nantes.fr/E230889R/projet-quoridor-mayssa" target="_blank" class="repo-link" onclick="event.stopPropagation()">GitLab &#8599;</a>
+          <span class="project-arrow">&#8594;</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="window.open('https://gitlab.univ-nantes.fr/E230889R/projetasd3','_blank')">
+        <div>
+          <div class="project-num">Projet 03</div>
+          <h3>Compression d'images</h3>
+          <p>Conception et implémentation d'un algorithme de réduction du poids des fichiers images. Exploration des techniques de compression, optimisation des performances.</p>
+          <div class="project-stack"><span class="tag">Java</span><span class="tag blue">Algorithmique</span><span class="tag blue">Traitement d'images</span></div>
+        </div>
+        <div class="project-right">
+          <a href="https://gitlab.univ-nantes.fr/E230889R/projetasd3" target="_blank" class="repo-link" onclick="event.stopPropagation()">GitLab &#8599;</a>
+          <span class="project-arrow">&#8594;</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="window.open('https://gitlab.univ-nantes.fr/E230889R/monopoly-poo-24-25-16','_blank')">
+        <div>
+          <div class="project-num">Projet 04</div>
+          <h3>Monopoly POO</h3>
+          <p>Recréation du célèbre jeu de société en appliquant rigoureusement les concepts de la Programmation Orientée Objet — héritage, polymorphisme, design patterns.</p>
+          <div class="project-stack"><span class="tag">Java</span><span class="tag blue">POO</span><span class="tag">Design Patterns</span></div>
+        </div>
+        <div class="project-right">
+          <a href="https://gitlab.univ-nantes.fr/E230889R/monopoly-poo-24-25-16" target="_blank" class="repo-link" onclick="event.stopPropagation()">GitLab &#8599;</a>
+          <span class="project-arrow">&#8594;</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="window.open('https://gitlab.univ-nantes.fr/E230889R/progfonctionnelle','_blank')">
+        <div>
+          <div class="project-num">Projet 05</div>
+          <h3>Mini Terminal en OCaml</h3>
+          <p>Développement d'un petit terminal fonctionnel en OCaml dans le cadre du cours de programmation fonctionnelle. Interprétation de commandes et exploration des paradigmes fonctionnels.</p>
+          <div class="project-stack"><span class="tag">OCaml</span><span class="tag blue">Prog. Fonctionnelle</span><span class="tag blue">Terminal</span></div>
+        </div>
+        <div class="project-right">
+          <a href="https://gitlab.univ-nantes.fr/E230889R/progfonctionnelle" target="_blank" class="repo-link" onclick="event.stopPropagation()">GitLab &#8599;</a>
+          <span class="project-arrow">&#8594;</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div>
+          <div class="project-num">Projet 06</div>
+          <h3>Éditeur d'images multi-filtres</h3>
+          <p>Développement d'un programme d'édition appliquant de multiples filtres sur les images — gestion des pixels, convolutions, transformations colorimétriques.</p>
+          <div class="project-stack"><span class="tag">C++</span><span class="tag blue">Traitement d'images</span><span class="tag blue">Filtres</span></div>
+        </div>
+        <div class="project-right">
+          <span class="project-arrow">&#8594;</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-header reveal">
+      <div class="section-num">// 04</div>
+      <h2 class="section-title">Expérience &amp; Certifications</h2>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-left">
+        <div class="exp-date">2 mois</div>
+        <div class="exp-company">MetaTrader</div>
+      </div>
+      <div class="exp-right">
+        <h3>Stage en Développement Robotique</h3>
+        <p>Développement technique sur la plateforme de trading MetaTrader. Conception et implémentation de scripts automatisés (robots de trading), analyse de données financières et optimisation des algorithmes d'exécution.</p>
+      </div>
+    </div>
+    <div class="cert-grid">
+      <div class="cert-card reveal">
+        <div class="cert-icon">&#128737;</div>
+        <div class="cert-body">
+          <h4>MOOC SecNumacadémie — ANSSI</h4>
+          <p>Attestation en cybersécurité avec scores &gt; 90% — programme officiel de l'Agence Nationale de la Sécurité des Systèmes d'Information</p>
+        </div>
+      </div>
+      <div class="cert-card reveal">
+        <div class="cert-icon">&#127760;</div>
+        <div class="cert-body">
+          <h4>Développement Web — Udemy</h4>
+          <p>Certifications en HTML, CSS, JavaScript, WordPress et SEO — développement web front-end et marketing digital</p>
+        </div>
+      </div>
+      <div class="cert-card reveal">
+        <div class="cert-icon">&#127942;</div>
+        <div class="cert-body">
+          <h4>EF SET — Niveau C1 en Anglais</h4>
+          <p>Certification internationale d'anglais niveau C1 (Advanced) obtenue en 2026</p>
+        </div>
+      </div>
+      <div class="cert-card reveal">
+        <div class="cert-icon">&#128220;</div>
+        <div class="cert-body">
+          <h4>Cambridge Assessment English — B1</h4>
+          <p>Certification Cambridge Assessment English niveau B1 obtenue en 2021</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="section-num reveal">// 05</div>
+      <h2 class="section-title reveal">Travaillons ensemble</h2>
+      <p class="contact-tagline reveal">
+        Je suis à la recherche d'un <strong>Master en Informatique</strong>, avec une orientation cybersécurité ou ingénierie logicielle. N'hésitez pas à me contacter !
+      </p>
+      <div class="contact-links reveal">
+        <a href="mailto:mayssabf2005@gmail.com" class="contact-link">&#9993; mayssabf2005@gmail.com</a>
+        <a href="tel:0780805797" class="contact-link">&#128222; 07 80 80 57 97</a>
+        <a href="#" class="contact-link">&#128205; Nantes, 44300</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&#169; 2025 Mayssa Ben Fredj &nbsp;&middot;&nbsp; Conçu &amp; développé avec passion</p>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = (mx - 6) + 'px';
+      cursor.style.top  = (my - 6) + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      ring.style.left = (rx - 18) + 'px';
+      ring.style.top  = (ry - 18) + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a, button, .skill-card, .project-card, .cert-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.style.width='60px'; ring.style.height='60px'; ring.style.opacity='0.8'; });
+      el.addEventListener('mouseleave', () => { ring.style.width='36px'; ring.style.height='36px'; ring.style.opacity='0.5'; });
+    });
+
+    // Matrix rain
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    const chars = '01アイウエオカキクケコサシスセソ';
+    const fs = 13;
+    let drops = [];
+    function initDrops() { drops = Array(Math.floor(canvas.width / fs)).fill(1); }
+    initDrops();
+    window.addEventListener('resize', initDrops);
+    setInterval(() => {
+      ctx.fillStyle = 'rgba(8,12,16,0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#00e5a0';
+      ctx.font = fs + 'px monospace';
+      drops.forEach((d, i) => {
+        ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fs, d * fs);
+        if (d * fs > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        else drops[i]++;
+      });
+    }, 60);
+
+    // Typing animation
+    const phrases = ['Étudiante en L3 Informatique', 'Passionnée de Cybersécurité', 'Développeuse Full-Stack', 'À la recherche d\'un Master'];
+    let pi = 0, ci = 0, deleting = false;
+    const typedEl = document.getElementById('typedText');
+    function type() {
+      const cur = phrases[pi];
+      if (!deleting) {
+        typedEl.textContent = cur.slice(0, ++ci);
+        if (ci === cur.length) { deleting = true; setTimeout(type, 1800); return; }
+      } else {
+        typedEl.textContent = cur.slice(0, --ci);
+        if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+      }
+      setTimeout(type, deleting ? 40 : 70);
+    }
+    type();
+
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => { if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 80); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+    // Language bars
+    const langObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.lang-fill').forEach(bar => {
+            bar.style.transform = 'scaleX(' + (parseFloat(bar.dataset.width) / 100) + ')';
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    const aboutEl = document.getElementById('about');
+    if (aboutEl) langObs.observe(aboutEl);
+
+    // Active nav highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav ul a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
+      navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : ''; });
+    });
+  </script>
+</body>
+</html>
