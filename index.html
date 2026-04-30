@@ -78,8 +78,10 @@
     .edu-item .school { color: var(--text-bright); }
     .edu-item .year { color: var(--text-dim); font-size: 0.7rem; }
     .interests { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
-    .tag { padding: 0.3rem 0.8rem; background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); color: var(--accent); font-size: 0.68rem; letter-spacing: 0.08em; }
+    .tag { padding: 0.3rem 0.8rem; background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.2); color: var(--accent); font-size: 0.68rem; letter-spacing: 0.08em; display: inline-block; transition: all 0.2s; }
+    .tag:hover { background: rgba(0,229,160,0.12); border-color: rgba(0,229,160,0.4); }
     .tag.blue { background: rgba(0,170,255,0.06); border-color: rgba(0,170,255,0.2); color: var(--accent2); }
+    .tag.blue:hover { background: rgba(0,170,255,0.12); border-color: rgba(0,170,255,0.4); }
 
     /* SKILLS */
     #skills { flex-direction: column; min-height: auto; padding-bottom: 6rem; }
@@ -175,10 +177,10 @@
 
   <!-- HERO -->
   <section id="hero">
-    <div class="hero-tag">À la recherche d'un Master · Nantes</div>
+    <div class="hero-tag">Acceptée Master CNAM · Cybersécurité · 2026</div>
     <h1 class="hero-name">Mayssa<br><span class="accent">Ben Fredj</span></h1>
     <div class="type-line"><span class="typed-text" id="typedText"></span></div>
-    <p class="hero-subtitle">Étudiante en L3 Informatique passionnée par la cybersécurité et l'ingénierie logicielle. Je code, je sécurise, je construis.</p>
+    <p class="hero-subtitle">Étudiante en L3 Informatique passionnée par la cybersécurité et l'ingénierie logicielle. Acceptée en Master au CNAM Bretagne. Je code, je sécurise, je construis.</p>
     <div class="hero-cta">
       <a href="#projects" class="btn btn-primary">Voir mes projets</a>
       <a href="#contact" class="btn btn-secondary">Me contacter</a>
@@ -197,7 +199,7 @@
     </div>
     <div class="about-grid">
       <div class="about-text reveal">
-        <p>Je suis <strong>Mayssa Ben Fredj</strong>, étudiante en L3 Informatique à <strong>Nantes Université</strong>, actuellement à la recherche d'un <strong>Master</strong> pour approfondir mes compétences.</p>
+        <p>Je suis <strong>Mayssa Ben Fredj</strong>, étudiante en L3 Informatique à <strong>Nantes Université</strong>, actuellement <strong>acceptée en Master Informatique au CNAM Bretagne/Angers</strong> avec une spécialisation en <strong>Sécurité informatique et Cybersécurité</strong> en alternance pour la rentrée 2026.</p>
         <p>Ma double passion pour la <strong>cybersécurité</strong> et l'<strong>ingénierie logicielle</strong> me pousse à explorer chaque couche du système — du réseau jusqu'à l'interface utilisateur.</p>
         <p>J'ai travaillé en équipe sur de nombreux projets universitaires ambitieux, de 3 à 16 personnes, en appliquant des méthodes de développement collaboratif et des concepts avancés de POO.</p>
         <div class="lang-list">
@@ -210,6 +212,7 @@
       <div class="reveal">
         <div class="info-card" style="margin-bottom:1.5rem">
           <h3>Formation</h3>
+          <div class="edu-item"><span class="school">M1 Sécurité informatique, cybersécurité et cyber menaces · CNAM Bretagne/Angers</span><span class="year">2026–27</span></div>
           <div class="edu-item"><span class="school">L3 Informatique · Nantes Université</span><span class="year">en cours</span></div>
           <div class="edu-item"><span class="school">L2 Informatique · Nantes Université</span><span class="year">2024–25</span></div>
           <div class="edu-item"><span class="school">L1 Informatique · Nantes Université</span><span class="year">2023–24</span></div>
@@ -218,7 +221,7 @@
         <div class="info-card">
           <h3>Centres d'intérêt</h3>
           <div class="interests">
-            <span class="tag">&#9822; Échecs (Ex-Championne)</span>
+            <a href="https://ratings.fide.com/profile/5503361" target="_blank" class="tag" style="text-decoration: none;">&#9822; Échecs (Ex-Championne)</a>
             <span class="tag blue">Natation</span>
             <span class="tag">Tennis</span>
             <span class="tag blue">Volley</span>
@@ -423,7 +426,7 @@
       <div class="section-num reveal">// 05</div>
       <h2 class="section-title reveal">Travaillons ensemble</h2>
       <p class="contact-tagline reveal">
-        Je suis à la recherche d'un <strong>Master en Informatique</strong>, avec une orientation cybersécurité ou ingénierie logicielle. N'hésitez pas à me contacter !
+        Acceptée en <strong>Master Informatique au CNAM Bretagne/Angers</strong> (Sécurité informatique et Cybersécurité) à partir de septembre 2026 en alternance. À la recherche d'un <strong>contrat d'alternance/apprentissage</strong>. N'hésitez pas à me contacter !
       </p>
       <div class="contact-links reveal">
         <a href="mailto:mayssabf2005@gmail.com" class="contact-link">&#9993; mayssabf2005@gmail.com</a>
@@ -484,7 +487,7 @@
     }, 60);
 
     // Typing animation
-    const phrases = ['Étudiante en L3 Informatique', 'Passionnée de Cybersécurité', 'Développeuse Full-Stack', 'À la recherche d\'un Master'];
+    const phrases = ['Étudiante en L3 Informatique', 'Master au CNAM Bretagne/Angers', 'Spécialisée en Cybersécurité', 'En quête d\'alternance'];
     let pi = 0, ci = 0, deleting = false;
     const typedEl = document.getElementById('typedText');
     function type() {
